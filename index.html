@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KRAVE — Video Editing Agency</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #1B1A1F;
+    --white: #ffffff;
+    --green: #4F7A6B;
+    --green-light: #6a9e8d;
+    --green-dim: rgba(79,122,107,0.12);
+    --green-border: rgba(79,122,107,0.25);
+    --surface: #222128;
+    --surface2: #2a292f;
+    --muted: rgba(255,255,255,0.45);
+    --muted2: rgba(255,255,255,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background: var(--green);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+    transform: translate(-50%, -50%);
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px;
+    height: 36px;
+    border: 1.5px solid rgba(79,122,107,0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transition: transform 0.08s ease, width 0.2s, height 0.2s, border-color 0.2s;
+    transform: translate(-50%, -50%);
+  }
+  .cursor.hover { transform: translate(-50%, -50%) scale(2.5); opacity: 0.6; }
+  .cursor-ring.hover { width: 60px; height: 60px; border-color: var(--green); }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 24px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(27,26,31,0.7);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--muted2);
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.08em;
+    color: var(--white);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+  .logo span { color: var(--green); }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+
+  .nav-cta {
+    background: var(--green);
+    color: var(--white) !important;
+    padding: 10px 24px;
+    border-radius: 6px;
+    font-weight: 600 !important;
+    transition: background 0.2s !important, color 0.2s !important;
+  }
+  .nav-cta:hover { background: var(--green-light) !important; color: var(--white) !important; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 48px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-noise {
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(79,122,107,0.18) 0%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--green-dim);
+    border: 1px solid var(--green-border);
+    color: var(--green-light);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 40px;
+    animation: fadeUp 0.8s ease both;
+  }
+  .hero-tag::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.7); }
+  }
+
+  .hero h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(72px, 10vw, 140px);
+    line-height: 0.92;
+    letter-spacing: 0.02em;
+    font-weight: 400;
+    margin-bottom: 30px;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: var(--green);
+  }
+
+  .hero-sub {
+    font-size: 17px;
+    color: var(--muted);
+    max-width: 520px;
+    line-height: 1.7;
+    font-weight: 400;
+    margin-bottom: 48px;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+
+  .btn-primary {
+    background: var(--green);
+    color: var(--white);
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    transition: background 0.2s, transform 0.2s;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--green-light); transform: translateY(-1px); }
+
+  .btn-ghost {
+    color: var(--muted);
+    padding: 14px 24px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-ghost:hover { color: var(--white); }
+  .btn-ghost svg { transition: transform 0.2s; }
+  .btn-ghost:hover svg { transform: translateX(4px); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* MARQUEE */
+  .marquee-wrap {
+    overflow: hidden;
+    border-top: 1px solid var(--muted2);
+    border-bottom: 1px solid var(--muted2);
+    padding: 18px 0;
+    background: var(--surface);
+  }
+  .marquee-track {
+    display: flex;
+    gap: 0;
+    animation: marquee 22s linear infinite;
+    width: max-content;
+  }
+  .marquee-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 40px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .marquee-dot { width: 4px; height: 4px; background: var(--green); border-radius: 50%; }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* SECTION COMMONS */
+  section { padding: 100px 48px; }
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 20px;
+  }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(42px, 5vw, 72px);
+    letter-spacing: 0.02em;
+    line-height: 1;
+    font-weight: 400;
+    margin-bottom: 20px;
+  }
+  .section-sub {
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.7;
+    max-width: 500px;
+  }
+
+  /* SERVICES */
+  .services { max-width: 1200px; margin: 0 auto; }
+  .services-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: end;
+    margin-bottom: 64px;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .service-card {
+    background: var(--surface);
+    padding: 40px 36px;
+    border: 1px solid var(--muted2);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, background 0.3s;
+    cursor: none;
+  }
+  .service-card:hover {
+    border-color: var(--green-border);
+    background: var(--surface2);
+  }
+  .service-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: var(--green);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .service-card:hover::before { transform: scaleX(1); }
+
+  .service-icon {
+    width: 44px;
+    height: 44px;
+    background: var(--green-dim);
+    border: 1px solid var(--green-border);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 28px;
+  }
+  .service-icon svg { width: 20px; height: 20px; stroke: var(--green); }
+
+  .service-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 12px;
+  }
+
+  .service-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 0.03em;
+    margin-bottom: 16px;
+    font-weight: 400;
+  }
+
+  .service-desc {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.7;
+    margin-bottom: 28px;
+  }
+
+  .service-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .service-list li {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .service-list li::before {
+    content: '';
+    width: 16px;
+    height: 1px;
+    background: var(--green);
+    flex-shrink: 0;
+  }
+
+  /* HOW IT WORKS */
+  .how {
+    background: var(--surface);
+    border-top: 1px solid var(--muted2);
+    border-bottom: 1px solid var(--muted2);
+  }
+  .how-inner { max-width: 1200px; margin: 0 auto; }
+  .how-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    margin-top: 64px;
+  }
+  .step {
+    padding: 40px 32px;
+    border: 1px solid var(--muted2);
+    background: var(--black);
+    position: relative;
+  }
+  .step-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    color: rgba(79,122,107,0.15);
+    line-height: 1;
+    margin-bottom: 20px;
+    font-weight: 400;
+  }
+  .step-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+  .step-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* PRICING */
+  .pricing-inner { max-width: 1200px; margin: 0 auto; }
+  .pricing-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: end;
+    margin-bottom: 64px;
+  }
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .plan {
+    background: var(--surface);
+    padding: 44px 36px;
+    border: 1px solid var(--muted2);
+    position: relative;
+    transition: border-color 0.3s;
+  }
+  .plan.featured {
+    background: var(--green);
+    border-color: var(--green);
+  }
+  .plan.featured .plan-price,
+  .plan.featured .plan-name,
+  .plan.featured .plan-period,
+  .plan.featured .plan-include-title { color: var(--white); }
+  .plan.featured .plan-desc,
+  .plan.featured .plan-include li { color: rgba(255,255,255,0.75); }
+  .plan.featured .plan-include li::before { background: rgba(255,255,255,0.5); }
+  .plan.featured .plan-badge { background: rgba(255,255,255,0.2); color: var(--white); }
+  .plan.featured .btn-plan {
+    background: var(--white);
+    color: var(--green);
+  }
+  .plan.featured .btn-plan:hover { background: rgba(255,255,255,0.9); }
+
+  .plan-badge {
+    display: inline-block;
+    background: var(--green-dim);
+    color: var(--green-light);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 28px;
+  }
+
+  .plan-name {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .plan-price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 60px;
+    letter-spacing: -0.01em;
+    font-weight: 400;
+    line-height: 1;
+  }
+  .plan-period {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    margin-top: 4px;
+  }
+  .plan-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--muted2);
+    margin-bottom: 28px;
+  }
+  .plan.featured .plan-desc { border-bottom-color: rgba(255,255,255,0.15); }
+
+  .plan-include-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .plan-include {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 36px;
+  }
+  .plan-include li {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .plan-include li::before {
+    content: '';
+    width: 14px;
+    height: 1px;
+    background: var(--green);
+    flex-shrink: 0;
+  }
+
+  .btn-plan {
+    display: block;
+    text-align: center;
+    background: var(--surface2);
+    color: var(--white);
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+    border: 1px solid var(--muted2);
+    cursor: none;
+  }
+  .btn-plan:hover { background: rgba(255,255,255,0.1); }
+
+  /* CLIENTS */
+  .clients-inner { max-width: 1200px; margin: 0 auto; text-align: center; }
+  .clients-title {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 48px;
+  }
+  .clients-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 64px;
+    flex-wrap: wrap;
+  }
+  .client-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.2);
+    font-weight: 400;
+    transition: color 0.2s;
+  }
+  .client-logo:hover { color: rgba(255,255,255,0.5); }
+
+  /* TESTIMONIALS */
+  .testimonials { background: var(--surface); border-top: 1px solid var(--muted2); }
+  .testimonials-inner { max-width: 1200px; margin: 0 auto; }
+  .testimonials-header { margin-bottom: 64px; }
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  .testimonial {
+    background: var(--black);
+    padding: 36px;
+    border: 1px solid var(--muted2);
+  }
+  .testimonial-stars {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+  }
+  .star { color: var(--green); font-size: 14px; }
+  .testimonial-text {
+    font-size: 15px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 28px;
+    font-style: italic;
+  }
+  .testimonial-author { display: flex; align-items: center; gap: 14px; }
+  .author-avatar {
+    width: 38px; height: 38px;
+    background: var(--green-dim);
+    border: 1px solid var(--green-border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--green);
+    flex-shrink: 0;
+  }
+  .author-name { font-size: 14px; font-weight: 600; }
+  .author-role { font-size: 12px; color: var(--muted); }
+
+  /* FAQ */
+  .faq-inner { max-width: 760px; margin: 0 auto; }
+  .faq-header { text-align: center; margin-bottom: 64px; }
+  .faq-item {
+    border-bottom: 1px solid var(--muted2);
+  }
+  .faq-q {
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--white);
+    text-align: left;
+    padding: 24px 0;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.01em;
+    transition: color 0.2s;
+  }
+  .faq-q:hover { color: var(--green-light); }
+  .faq-icon {
+    width: 24px; height: 24px;
+    border: 1px solid var(--muted2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s, border-color 0.2s;
+    font-size: 16px;
+    line-height: 1;
+    color: var(--muted);
+  }
+  .faq-item.open .faq-icon {
+    background: var(--green);
+    border-color: var(--green);
+    color: var(--white);
+  }
+  .faq-a {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.75;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.3s;
+    padding-bottom: 0;
+  }
+  .faq-item.open .faq-a {
+    max-height: 200px;
+    padding-bottom: 24px;
+  }
+
+  /* CTA SECTION */
+  .cta-section {
+    padding: 120px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-glow {
+    position: absolute;
+    width: 700px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(79,122,107,0.2) 0%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .cta-inner { position: relative; max-width: 700px; margin: 0 auto; }
+  .cta-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 7vw, 100px);
+    line-height: 0.95;
+    margin-bottom: 24px;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+  .cta-title em { font-style: normal; color: var(--green); }
+  .cta-sub {
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.7;
+    margin-bottom: 40px;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--muted2);
+    padding: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+  }
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.08em;
+    color: var(--white);
+  }
+  .footer-logo span { color: var(--green); }
+  .footer-links { display: flex; gap: 32px; }
+  .footer-links a {
+    font-size: 12px;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--white); }
+  .footer-copy { font-size: 12px; color: rgba(255,255,255,0.2); }
+
+  /* Scroll reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 900px) {
+    nav { padding: 20px 24px; }
+    .nav-links { display: none; }
+    section { padding: 72px 24px; }
+    .services-header, .pricing-header { grid-template-columns: 1fr; gap: 24px; }
+    .services-grid, .pricing-grid, .how-steps, .testimonials-grid { grid-template-columns: 1fr; }
+    .clients-row { gap: 32px; }
+    footer { flex-direction: column; gap: 24px; text-align: center; }
+    .footer-links { flex-wrap: wrap; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo"><span>K</span>RAVE</a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#how">Process</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#contact" class="nav-cta">Get Started</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-noise"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-tag">Video Editing Agency</div>
+  <h1>VIDEO THAT<br><em>CONVERTS.</em></h1>
+  <p class="hero-sub">Performance editing for eCom brands, SaaS companies, personal brands, and creators who refuse to blend in.</p>
+  <div class="hero-actions">
+    <a href="#pricing" class="btn-primary">See Pricing</a>
+    <a href="#services" class="btn-ghost">
+      Our Services
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <div class="marquee-item"><span class="marquee-dot"></span>Performance Ads</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>eCom Creative</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Motion Graphics</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>YouTube Content</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>SaaS Launch Videos</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Personal Brand</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Multiple Hooks</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Organic Edits</div>
+    <!-- duplicate for loop -->
+    <div class="marquee-item"><span class="marquee-dot"></span>Performance Ads</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>eCom Creative</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Motion Graphics</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>YouTube Content</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>SaaS Launch Videos</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Personal Brand</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Multiple Hooks</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Organic Edits</div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="services">
+    <div class="services-header reveal">
+      <div>
+        <div class="section-label">What We Do</div>
+        <div class="section-title">BUILT FOR<br>EVERY STAGE</div>
+      </div>
+      <p class="section-sub">Whether you're scaling spend, launching a product, or building an audience — we edit for the outcome, not just the timeline.</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <div class="service-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.954-7.1A60.114 60.114 0 006.037 5.1M7.5 14.25L5.106 5.935"/></svg>
+        </div>
+        <div class="service-tag">eCommerce</div>
+        <div class="service-name">ECOM ADS</div>
+        <p class="service-desc">Performance editing engineered to stop the scroll and drive purchases. Multiple angles, hooks, and formats — built to test and scale.</p>
+        <ul class="service-list">
+          <li>Multiple hook variations per creative</li>
+          <li>Multi-angle ad sets</li>
+          <li>UGC-style & branded formats</li>
+          <li>Direct response copy overlays</li>
+        </ul>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25A2.25 2.25 0 015.25 3h13.5A2.25 2.25 0 0121 5.25z"/></svg>
+        </div>
+        <div class="service-tag">SaaS</div>
+        <div class="service-name">SAAS VIDEO</div>
+        <p class="service-desc">Ads that explain and convert, plus launch videos that make your product feel inevitable. Motion graphics included.</p>
+        <ul class="service-list">
+          <li>Paid ad creatives</li>
+          <li>Product launch videos</li>
+          <li>Motion graphics & UI animation</li>
+          <li>Feature explainer edits</li>
+        </ul>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+        </div>
+        <div class="service-tag">Personal Brand & YouTube</div>
+        <div class="service-name">CREATORS</div>
+        <p class="service-desc">Organic and paid edits for personal brands and YouTubers building a loyal audience and a recognizable identity.</p>
+        <ul class="service-list">
+          <li>Long-form YouTube editing</li>
+          <li>Shorts & Reels repurposing</li>
+          <li>Paid social ad edits</li>
+          <li>Consistent brand feel</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="how-inner">
+    <div class="reveal">
+      <div class="section-label">The Process</div>
+      <div class="section-title">SIMPLE. FAST.<br>NO BACK & FORTH.</div>
+    </div>
+    <div class="how-steps">
+      <div class="step reveal">
+        <div class="step-num">01</div>
+        <div class="step-title">Subscribe & Onboard</div>
+        <p class="step-desc">Pick a plan, fill a short brief, and share your brand assets. We're ready to start within 24 hours.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">02</div>
+        <div class="step-title">Submit a Request</div>
+        <p class="step-desc">Drop your footage, a reference, and a one-liner on what you need. No lengthy calls required.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">03</div>
+        <div class="step-title">Receive Your Edit</div>
+        <p class="step-desc">Most deliverables land within 2–3 business days. Complex motion work takes 4–5.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">04</div>
+        <div class="step-title">Revise & Repeat</div>
+        <p class="step-desc">Unlimited revisions until it's exactly right. Then queue the next one — the pipeline never stops.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="pricing-inner">
+    <div class="pricing-header reveal">
+      <div>
+        <div class="section-label">Pricing</div>
+        <div class="section-title">FLAT RATE.<br>NO SURPRISES.</div>
+      </div>
+      <p class="section-sub">Pause or cancel anytime. No contracts, no hidden fees. Just results.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="plan reveal">
+        <div class="plan-badge">Starter</div>
+        <div class="plan-name">Essentials</div>
+        <div class="plan-price">$997</div>
+        <div class="plan-period">/ month</div>
+        <p class="plan-desc">For brands testing video or running a single creative channel.</p>
+        <div class="plan-include-title">What's included</div>
+        <ul class="plan-include">
+          <li>4 videos per month</li>
+          <li>2 revision rounds each</li>
+          <li>eCom or Personal Brand</li>
+          <li>Dedicated editor</li>
+          <li>Slack communication</li>
+        </ul>
+        <a href="#contact" class="btn-plan">Get Started</a>
+      </div>
+      <div class="plan featured reveal">
+        <div class="plan-badge">Most Popular</div>
+        <div class="plan-name">Growth</div>
+        <div class="plan-price">$1,997</div>
+        <div class="plan-period">/ month</div>
+        <p class="plan-desc">For scaling brands that need consistent creative output to feed the algorithm.</p>
+        <div class="plan-include-title">What's included</div>
+        <ul class="plan-include">
+          <li>10 videos per month</li>
+          <li>Unlimited revisions</li>
+          <li>All service types</li>
+          <li>Priority turnaround</li>
+          <li>Motion graphics access</li>
+          <li>Dedicated editor + QC</li>
+        </ul>
+        <a href="#contact" class="btn-plan">Get Started</a>
+      </div>
+      <div class="plan reveal">
+        <div class="plan-badge">Agency</div>
+        <div class="plan-name">Scale</div>
+        <div class="plan-price">Custom</div>
+        <div class="plan-period">tailored to volume</div>
+        <p class="plan-desc">For agencies and brands with high-volume needs across multiple channels.</p>
+        <div class="plan-include-title">What's included</div>
+        <ul class="plan-include">
+          <li>Unlimited requests</li>
+          <li>Full team access</li>
+          <li>White-label delivery</li>
+          <li>Account manager</li>
+          <li>Custom SLA</li>
+        </ul>
+        <a href="#contact" class="btn-plan">Book a Call</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CLIENTS -->
+<section style="padding: 60px 48px; background: var(--surface); border-top: 1px solid var(--muted2);">
+  <div class="clients-inner reveal">
+    <div class="clients-title">Trusted by brands doing real numbers</div>
+    <div class="clients-row">
+      <div class="client-logo">BRANDNAME</div>
+      <div class="client-logo">SHOPIFY CO</div>
+      <div class="client-logo">GROWTHLAB</div>
+      <div class="client-logo">SAASLY</div>
+      <div class="client-logo">CREATORK</div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+  <div class="testimonials-inner">
+    <div class="testimonials-header reveal">
+      <div class="section-label">Social Proof</div>
+      <div class="section-title">RESULTS SPEAK<br>FOR THEMSELVES</div>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial reveal">
+        <div class="testimonial-stars">
+          <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+        </div>
+        <p class="testimonial-text">"Our ROAS went from 2.1x to 4.8x within 6 weeks of switching to Krave for our ad creative. The multi-hook approach is a game changer."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">JM</div>
+          <div>
+            <div class="author-name">James M.</div>
+            <div class="author-role">Founder, DTC Skincare Brand</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial reveal">
+        <div class="testimonial-stars">
+          <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+        </div>
+        <p class="testimonial-text">"We launched our SaaS with a motion video from Krave and it drove 40% of our first-week signups. The production quality shocked our investors."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">SR</div>
+          <div>
+            <div class="author-name">Sarah R.</div>
+            <div class="author-role">CEO, B2B SaaS Platform</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial reveal">
+        <div class="testimonial-stars">
+          <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+        </div>
+        <p class="testimonial-text">"I went from 12K to 89K subscribers in 4 months. The editing style they built for me is completely distinct — people recognize my content instantly."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">AK</div>
+          <div>
+            <div class="author-name">Alex K.</div>
+            <div class="author-role">YouTuber & Personal Brand</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="faq-inner">
+    <div class="faq-header reveal">
+      <div class="section-label">FAQ</div>
+      <div class="section-title">QUESTIONS<br>ANSWERED</div>
+    </div>
+    <div class="faq-item reveal">
+      <button class="faq-q" onclick="toggleFAQ(this)">
+        How fast do I get my edits?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-a">Standard edits land in 2–3 business days. Motion graphics and more complex productions take 4–5 business days. Once onboarded, you can queue requests continuously — we work on them in order.</div>
+    </div>
+    <div class="faq-item reveal">
+      <button class="faq-q" onclick="toggleFAQ(this)">
+        What if I need revisions?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-a">Essentials plan includes 2 revision rounds per video. Growth and Scale plans include unlimited revisions. We iterate until you're satisfied — no extra charges.</div>
+    </div>
+    <div class="faq-item reveal">
+      <button class="faq-q" onclick="toggleFAQ(this)">
+        Do you do 3D animation?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-a">Not currently in our standard packages. For the right project and budget, we're open to scoping it out — reach out and let's talk.</div>
+    </div>
+    <div class="faq-item reveal">
+      <button class="faq-q" onclick="toggleFAQ(this)">
+        Can I pause my subscription?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-a">Yes. Pause anytime if you have nothing in the queue and resume when you're ready. You're never locked in — we earn your business every month.</div>
+    </div>
+    <div class="faq-item reveal">
+      <button class="faq-q" onclick="toggleFAQ(this)">
+        What software do you edit in?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-a">Primarily Adobe Premiere Pro and After Effects for motion work. We deliver in whatever format you need — MP4, ProRes, or platform-optimized presets.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="contact">
+  <div class="cta-glow"></div>
+  <div class="cta-inner reveal">
+    <div class="section-label" style="justify-content: center; display: flex;">Ready?</div>
+    <div class="cta-title">STOP LEAVING<br>MONEY ON THE<br><em>TIMELINE.</em></div>
+    <p class="cta-sub">Book a 15-minute call. We'll scope your project, tell you exactly what we'd do, and give you a real timeline — no fluff.</p>
+    <a href="/cdn-cgi/l/email-protection#422a272e2e2d0229302334276c313637262b2d" class="btn-primary" style="font-size: 15px; padding: 16px 40px;">Book a Call →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo"><span>K</span>RAVE</div>
+  <div class="footer-links">
+    <a href="#services">Services</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#faq">FAQ</a>
+    <a href="/cdn-cgi/l/email-protection#a5cdc0c9c9cae5ced7c4d3c08bd6d1d0c1ccca">Contact</a>
+  </div>
+  <div class="footer-copy">© 2025 Krave. All rights reserved.</div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+
+  function animateRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, button, .service-card, .plan').forEach(el => {
+    el.addEventListener('mouseenter', () => { cursor.classList.add('hover'); ring.classList.add('hover'); });
+    el.addEventListener('mouseleave', () => { cursor.classList.remove('hover'); ring.classList.remove('hover'); });
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), 0);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // FAQ toggle
+  function toggleFAQ(btn) {
+    const item = btn.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => {
+      i.classList.remove('open');
+      i.querySelecto
