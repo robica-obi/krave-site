@@ -44,7 +44,9 @@
     z-index: 9999;
     transition: transform 0.15s ease, opacity 0.15s ease;
     transform: translate(-50%, -50%);
+    opacity: 0;
   }
+  .cursor.active { opacity: 1; }
   .cursor-ring {
     position: fixed;
     width: 36px;
@@ -53,9 +55,11 @@
     border-radius: 50%;
     pointer-events: none;
     z-index: 9998;
-    transition: transform 0.08s ease, width 0.2s, height 0.2s, border-color 0.2s;
+    transition: width 0.2s, height 0.2s, border-color 0.2s, opacity 0.3s;
     transform: translate(-50%, -50%);
+    opacity: 0;
   }
+  .cursor-ring.active { opacity: 1; }
   .cursor.hover { transform: translate(-50%, -50%) scale(2.5); opacity: 0.6; }
   .cursor-ring.hover { width: 60px; height: 60px; border-color: var(--green); }
 
@@ -766,6 +770,10 @@
     transition: opacity 0.6s ease, transform 0.6s ease;
   }
   .reveal.visible { opacity: 1; transform: translateY(0); }
+  /* Fallback: if JS fails or IntersectionObserver not supported, show everything */
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; }
+  }
 
   @media (max-width: 900px) {
     nav { padding: 20px 24px; }
@@ -1105,7 +1113,7 @@
     <div class="section-label" style="justify-content: center; display: flex;">Ready?</div>
     <div class="cta-title">STOP LEAVING<br>MONEY ON THE<br><em>TIMELINE.</em></div>
     <p class="cta-sub">Book a 15-minute call. We'll scope your project, tell you exactly what we'd do, and give you a real timeline — no fluff.</p>
-    <a href="/cdn-cgi/l/email-protection#422a272e2e2d0229302334276c313637262b2d" class="btn-primary" style="font-size: 15px; padding: 16px 40px;">Book a Call →</a>
+    <a href="/cdn-cgi/l/email-protection#066e636a6a69466d7467706328757273626f69" class="btn-primary" style="font-size: 15px; padding: 16px 40px;">Book a Call →</a>
   </div>
 </section>
 
@@ -1116,7 +1124,7 @@
     <a href="#services">Services</a>
     <a href="#pricing">Pricing</a>
     <a href="#faq">FAQ</a>
-    <a href="/cdn-cgi/l/email-protection#a5cdc0c9c9cae5ced7c4d3c08bd6d1d0c1ccca">Contact</a>
+    <a href="/cdn-cgi/l/email-protection#bcd4d9d0d0d3fcd7ceddcad992cfc8c9d8d5d3">Contact</a>
   </div>
   <div class="footer-copy">© 2025 Krave. All rights reserved.</div>
 </footer>
@@ -1125,12 +1133,14 @@
   // Custom cursor
   const cursor = document.getElementById('cursor');
   const ring = document.getElementById('cursorRing');
-  let mx = 0, my = 0, rx = 0, ry = 0;
+  let mx = -200, my = -200, rx = -200, ry = -200;
 
   document.addEventListener('mousemove', e => {
     mx = e.clientX; my = e.clientY;
     cursor.style.left = mx + 'px';
     cursor.style.top = my + 'px';
+    cursor.classList.add('active');
+    ring.classList.add('active');
   });
 
   function animateRing() {
@@ -1148,15 +1158,34 @@
   });
 
   // Scroll reveal
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach((e, i) => {
-      if (e.isIntersecting) {
-        setTimeout(() => e.target.classList.add('visible'), 0);
+  const revealEls = document.querySelectorAll('.reveal');
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    revealEls.forEach(el => observer.observe(el));
+  } else {
+    // Fallback: show all immediately
+    revealEls.forEach(el => el.classList.add('visible'));
+  }
+
+  // Also trigger reveals on scroll for safety
+  function checkReveals() {
+    revealEls.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight - 40) {
+        el.classList.add('visible');
       }
     });
-  }, { threshold: 0.1 });
-
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  }
+  window.addEventListener('scroll', checkReveals, { passive: true });
+  checkReveals(); // run on load
 
   // FAQ toggle
   function toggleFAQ(btn) {
